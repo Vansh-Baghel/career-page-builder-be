@@ -112,7 +112,6 @@ export const getPreview = async (req: Request, res: Response) => {
   if (!company) return res.status(404).json({ message: "Company Not Found" });
 
   const preview = company.preview;
-  console.log("🚀 ~ getPreview ~ preview:", preview)
 
   return res.json({
     company_name: company.name,
