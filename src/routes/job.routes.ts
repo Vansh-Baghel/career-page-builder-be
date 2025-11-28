@@ -3,7 +3,7 @@ import { createJob, deleteJob, editJob, getOneJob, getJobs } from "../controller
 
 const router = express.Router();
 
-router.get("/jobs", getJobs);
+router.get("/:companySlug/jobs", getJobs);
 
 router.get("/:companySlug/job/:jobSlug", getOneJob);
 

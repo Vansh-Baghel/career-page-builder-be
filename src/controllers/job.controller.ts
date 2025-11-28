@@ -6,7 +6,7 @@ import slugify from "slugify";
 import { nanoid } from "nanoid";
 
 export const getOneJob = async (req: Request, res: Response) => {
-  const {company_slug, job_slug} = req.params;
+  const { company_slug, job_slug } = req.params;
 
   const companyRepo = AppDataSource.getRepository(Company);
   const jobRepo = AppDataSource.getRepository(Job);
@@ -28,10 +28,15 @@ export const getOneJob = async (req: Request, res: Response) => {
   }
 
   return res.json(job);
-}
+};
 
 export const getJobs = async (req: Request, res: Response) => {
+  const { page = 1, limit = 10 } = req.query;
   const { company_slug } = req.params;
+
+  const take = Number(limit);
+  const currentPage = Number(page);
+  const skip = (currentPage - 1) * take;
 
   const companyRepo = AppDataSource.getRepository(Company);
   const jobRepo = AppDataSource.getRepository(Job);
@@ -44,14 +49,32 @@ export const getJobs = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "Company Not Found" });
   }
 
+  const totalJobs = await jobRepo.count({
+    where: {
+      company: { id: company.id },
+    },
+  });
+
   const jobs = await jobRepo.find({
     where: { company: { id: company.id } },
     order: { created_at: "DESC" },
+    take,
+    skip,
   });
+  const totalPages = Math.ceil(totalJobs / take);
 
-  return res.json(jobs);
+  return res.json({
+    jobs,
+    totalJobs,
+    pagination: {
+      totalPages,
+      currentPage,
+      pageSize: take,
+      nextPage: currentPage < totalPages ? currentPage + 1 : null,
+      prevPage: currentPage > 1 ? currentPage - 1 : null,
+    },
+  });
 };
-
 
 export const createJob = async (req: Request, res: Response) => {
   const { companySlug } = req.params;
@@ -64,7 +87,7 @@ export const createJob = async (req: Request, res: Response) => {
     employment_type,
     experience_level,
     job_type,
-    salary_range,
+    salary,
   } = req.body;
 
   try {
@@ -91,9 +114,9 @@ export const createJob = async (req: Request, res: Response) => {
       employment_type,
       experience_level,
       job_type,
-      salary_range,
+      salary,
       job_slug,
-      posted_days_ago: 0,
+      posted_days_ago: "0 days ago",
       is_published: true,
     });
 
@@ -141,7 +164,7 @@ export const editJob = async (req: Request, res: Response) => {
       "employment_type",
       "experience_level",
       "job_type",
-      "salary_range",
+      "salary",
     ];
 
     for (const field of allowedFields) {

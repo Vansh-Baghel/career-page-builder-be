@@ -26,8 +26,8 @@ export const updatePreview = async (req: Request, res: Response) => {
     where: { slug: companySlug },
     relations: ["preview"],
   });
-  
-  console.log("🚀 ~ updatePreview ~ company:", company)
+
+  console.log("🚀 ~ updatePreview ~ company:", company);
 
   if (!company) {
     return res.status(404).json({ message: "Company Not Found" });
@@ -35,7 +35,7 @@ export const updatePreview = async (req: Request, res: Response) => {
 
   // Create preview row if missing
   let preview = company.preview;
-  console.log("🚀 ~ updatePreview ~ preview:", preview)
+  console.log("🚀 ~ updatePreview ~ preview:", preview);
 
   if (!preview) {
     const preview = previewRepo.create({
@@ -114,11 +114,32 @@ export const getPreview = async (req: Request, res: Response) => {
   const preview = company.preview;
 
   return res.json({
-    company_name: company.name,
+    name: company.name,
     logo_url: preview?.logo_url || null,
     banner_url: preview?.banner_url || null,
     brand_color: preview?.brand_color || null,
     culture_video_url: preview?.culture_video_url || null,
     sections: preview?.sections || [],
+  });
+};
+
+export const getPublished = async (req: Request, res: Response) => {
+  const { companySlug } = req.params;
+
+  const repo = AppDataSource.getRepository(Company);
+
+  const company = await repo.findOne({
+    where: { slug: companySlug },
+  });
+
+  if (!company) return res.status(404).json({ message: "Company Not Found" });
+
+  return res.json({
+    name: company.name,
+    logo_url: company.published_logo_url || null,
+    banner_url: company.published_banner_url || null,
+    brand_color: company.published_brand_color || null,
+    culture_video_url: company.published_culture_video_url || null,
+    sections: company.published_sections || [],
   });
 };

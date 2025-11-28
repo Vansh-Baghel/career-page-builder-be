@@ -5,6 +5,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from "typeorm";
 import { Company } from "./company";
 
@@ -14,12 +15,13 @@ export class Job {
   id: string;
 
   @ManyToOne(() => Company, (company) => company.jobs, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "company_id" })
   company: Company;
 
   @Column()
   title: string;
 
-  @Column({ type: "enum", enum: ["remote", "hybrid", "onsite"] })
+  @Column({ type: "text" })
   work_policy: string;
 
   @Column()
@@ -29,25 +31,24 @@ export class Job {
   department: string;
 
   @Column({
-    type: "enum",
-    enum: ["full-time", "part-time", "internship"],
+    type: "text",
   })
   employment_type: string;
 
-  @Column({ type: "enum", enum: ["junior", "mid", "senior"] })
+  @Column({ type: "text" })
   experience_level: string;
 
-  @Column({ type: "enum", enum: ["permanent", "contract"] })
+  @Column({ type: "text" })
   job_type: string;
 
   @Column()
-  salary_range: string;
+  salary: string;
 
   @Column()
   job_slug: string;
 
-  @Column({ type: "int" })
-  posted_days_ago: number;
+  @Column()
+  posted_days_ago: string;
 
   @Column({ default: true })
   is_published: boolean;
