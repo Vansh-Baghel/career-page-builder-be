@@ -3,19 +3,14 @@ import { createJob, deleteJob, editJob, getOneJob, getJobs } from "../controller
 
 const router = express.Router();
 
-// GET /:companySlug/jobs
-router.get("/job/:jobSlug", getOneJob);
-
-// GET /:companySlug/jobs
 router.get("/jobs", getJobs);
 
-// POST /:companySlug/jobs
-router.post("/job", createJob);
+router.get("/:companySlug/job/:jobSlug", getOneJob);
 
-// PATCH /:companySlug/job/edit
-router.patch("/job/:jobSlug/edit", editJob);
+router.post("/:companySlug/job", createJob);
 
-// DELETE /:companySlug/job/delete
-router.delete("/job/:jobSlug/delete", deleteJob);
+router.patch("/:companySlug/job/:jobSlug/edit", editJob);
+
+router.delete("/:companySlug/job/:jobSlug/delete", deleteJob);
 
 export default router;

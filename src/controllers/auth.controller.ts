@@ -28,8 +28,14 @@ export const login = async (req: Request, res: Response) => {
 
   return res.json({
     token,
-    company_slug: user.company.slug,
-    company_name: user.company.name,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      company_id: user.company.id,
+      company_slug: user.company.slug,
+    },
   });
 };
 
@@ -85,23 +91,29 @@ export const signup = async (req: Request, res: Response) => {
     company.preview = preview;
   }
 
-  // Create recruiter in the company
+  // Create user in the company
   const password_hash = await bcrypt.hash(password, 10);
-  const recruiter = recruiterRepo.create({
+  const user = recruiterRepo.create({
     name,
     email,
     password_hash,
     company,
   });
-  await recruiterRepo.save(recruiter);
+  await recruiterRepo.save(user);
 
   // Generate token
-  const token = jwt.sign({ userId: recruiter.id }, process.env.JWT_SECRET!);
+  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!);
 
   res.json({
     token,
-    company_slug: company.slug,
-    company_name: company.name,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      company_id: user.company.id,
+      company_slug: user.company.slug,
+    },
     message: company
       ? "Joined company successfully"
       : "Company created and joined",
